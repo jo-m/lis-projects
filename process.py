@@ -11,7 +11,6 @@ import sklearn.cross_validation as skcv
 
 """
 http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html#example-linear-model-plot-ols-py
-@@ -15,6 +18,13 @@ http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols_ridge_varianc
 http://scikit-learn.org/stable/auto_examples/linear_model/plot_polynomial_interpolation.html
 http://stats.stackexchange.com/questions/58739/polynomial-regression-using-scikit-learn
 http://www.datarobot.com/blog/regularized-linear-regression-with-scikit-learn/
@@ -25,8 +24,21 @@ http://www.datarobot.com/blog/regularized-linear-regression-with-scikit-learn/
 """
 
 
-@@ -27,33 +37,54 @@ def load_data(fname):
+def load_data(fname):
+    data = pd.read_csv('data/%s.csv' % fname,
+                       index_col=False,
+                       header=None,
+                       names=['date', 'A', 'B', 'C', 'D', 'E', 'F'])
+
+    # date transformations
+    data['date'] = pd.to_datetime(data['date'])
+    data['dayofyear'] = data['date'].apply(lambda x: x.dayofyear)
+    data['weekday'] = data['date'].apply(lambda x: x.isoweekday())
+    data['hour'] = data['date'].apply(lambda x: x.hour)
+    data['min'] = data['date'].apply(lambda x: x.minute)
     data['date'] = data['date'].apply(matplotlib.dates.date2num)
+    del data['date']
+
     return data
 
 train = load_data('train')
