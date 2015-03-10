@@ -46,25 +46,28 @@ def load_data(fname):
     data['date'] = data['date'].apply(dateutil.parser.parse)    
     data['weekday0'] = data['date'].apply(dt.datetime.weekday)
     data['weekend'] = data['date'].apply(dt.datetime.weekday) >4
+    data['notWeekend'] =  (data['weekend'] *-1)+1
     data['month'] = data['date'].apply(lambda x:x.month)
     data['hour0'] = data['date'].apply(lambda x:x.hour)
     data['year0'] = data['date'].apply(lambda x:x.year)
     
-        
+     
     
     del data['date']
     del data['month']
     del data['weekday0']
     del data['year0']
     #del data['hour0']
-    del data['weekend']
+    #del data['weekend']
+    #del data['notWeekend']
     del data['A']
     del data['B']
     del data['C']
     del data['D']
     del data['E']
     del data['F']
-        
+    
+    
     return data
 
 
@@ -148,9 +151,10 @@ def polyreg():
     from sklearn.preprocessing import PolynomialFeatures
     from sklearn.linear_model import LinearRegression
     from sklearn.pipeline import make_pipeline
+    from sklearn.decomposition import PCA
     
 
-    model = make_pipeline( PolynomialFeatures(5), LinearRegression() )
+    model = make_pipeline( PolynomialFeatures(30), LinearRegression() )
     
     model.fit(Xtrain,Ytrain) #Ohne Aufteilung in Sets, da das von grid search übernommen wird? -> Ja von cv
     
@@ -165,16 +169,62 @@ def polyreg():
 
 
 def svmReg():
-    from sklearn import svm
-    svc = svm.SVC(kernel='poly')
-    svc.fit(Xtrain, Ytrain)
+    from sklearn.pipeline import Pipeline
+    from sklearn.svm import SVC
+    from sklearn.decomposition import PCA
     
-    Ypred = svc.predict(Xtest)
+    estimators = [('reduce_dim', PCA()), ('svm', SVC())]
+    clf = Pipeline(estimators)
+    clf.fit(Xtrain, Ytrain)
+    
+    Ypred = clf.predict(Xtest)
+
+    print logscore( Ytest, Ypred) 
+
+def linWithDimReg():
+    from sklearn.pipeline import Pipeline
+    from sklearn.linear_model import Lasso
+    from sklearn.preprocessing import PolynomialFeatures
+    from sklearn.decomposition import PCA
+    
+    estimators = [('reduce_dim', PCA()), ('poly', PolynomialFeatures(10)),  ('ridge', Lasso())]
+    
+    clf = Pipeline(estimators)
+    clf.fit(Xtrain, Ytrain)
+    
+    Ypred = clf.predict(Xtest)
 
     print logscore( Ytest, Ypred) 
 
 
+def linregTrans():
+    
 
+    from sklearn.pipeline import Pipeline
+    from sklearn.linear_model import LinearRegression
+    from sklearn.preprocessing import PolynomialFeatures
+       
+    
+    estimators = [('poly', PolynomialFeatures(10)),  ('linear', LinearRegression())]
+    
+    regressor = Pipeline(estimators)
+    
+    regressor.fit(Xtrain,np.log(Ytrain)) #Ohne Aufteilung in Sets, da das von grid search übernommen wird? -> Ja von cv
+    
+    #scorefun = skmet.make_scorer(logscore)
+    #scores = skcv.cross_val_score(regressor, X, Y, scoring=scorefun, cv=5)   
+    
+    #print scores
+    
+    Ypred = np.array(regressor.predict(Xtest),dtype=float) 
+    
+    print logscore( Ytest, np.exp(Ypred ) )
+    
+    
+    validate = load_data('validate')
+    np.savetxt('results/validate.txt', np.exp( np.array( regressor.predict(validate), dtype=float) ) )
+    
+    
 
 
 X = load_data('train')
@@ -187,9 +237,13 @@ Y = pd.read_csv('data/train_y.csv',
 
 Xtrain, Xtest, Ytrain, Ytest = skcv.train_test_split(X, Y, train_size=.75)
 
+linregTrans()
 
-svmReg()
-            
+Y=np.sort(Y, axis=0)
+
+plt.plot(np.log(Y),'.')
+plt.show()
+
             
 
 #import sklearn.linear_model as sklin
