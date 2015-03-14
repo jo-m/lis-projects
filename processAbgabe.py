@@ -32,7 +32,6 @@ def load_data(fname):
     data['date'] = data['date'].apply(dateutil.parser.parse)    
     data['weekday'] = data['date'].apply(dt.datetime.weekday)
     data['weekend'] = data['date'].apply(dt.datetime.weekday) >4
-    data['notWeekend'] =  (data['weekend'] *-1)+1
     data['month'] = data['date'].apply(lambda x:x.month)
     data['hour'] = data['date'].apply(lambda x:x.hour)
     data['year'] = data['date'].apply(lambda x:x.year)
@@ -46,7 +45,6 @@ def load_data(fname):
     #del data['year']
     #del data['hour']
     #del data['weekend']
-    del data['notWeekend']
     #del data['A']
     #del data['B']
     #del data['C']
@@ -65,8 +63,7 @@ def apply_polynominals(X, column, p=30):
     
 def transformFeatures(X):
     
-    apply_polynominals(X, 'hour', 30)
-    apply_polynominals(X, 'weekend', 1)
+    apply_polynominals(X, 'hour', 10)
     
     for col in X.columns:
         std=np.std(X[col])
@@ -91,10 +88,10 @@ def linregTrans():
     Ypred = np.array(regressor.predict(Xtest),dtype=float) 
     
     print logscore( Ytest, np.exp(Ypred ) )
-    
-    Xvalidate = load_data('validate')
-    Xvalidate = transformFeatures(Xvalidate)
-    np.savetxt('results/validate.txt', np.exp(regressor.predict(Xvalidate)))
+        
+    validate = load_data('validate')
+    validate = transformFeatures(validate)    
+    np.savetxt('results/validate.txt', np.exp(np.array( regressor.predict(validate), dtype=float)))  
  
 
 X = load_data('train')
