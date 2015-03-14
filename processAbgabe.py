@@ -17,9 +17,8 @@ import pandas as pd
 import datetime as dt
 import dateutil
 
-from sklearn.pipeline import Pipeline
+
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
 import sklearn.cross_validation as skcv
 
 
@@ -31,43 +30,43 @@ def load_data(fname):
                        names=['date', 'A', 'B', 'C', 'D', 'E', 'F'])
                      
     data['date'] = data['date'].apply(dateutil.parser.parse)    
-    data['weekday0'] = data['date'].apply(dt.datetime.weekday)
+    data['weekday'] = data['date'].apply(dt.datetime.weekday)
     data['weekend'] = data['date'].apply(dt.datetime.weekday) >4
     data['notWeekend'] =  (data['weekend'] *-1)+1
     data['month'] = data['date'].apply(lambda x:x.month)
-    data['hour0'] = data['date'].apply(lambda x:x.hour)
-    data['year0'] = data['date'].apply(lambda x:x.year)
-    
-     
+    data['hour'] = data['date'].apply(lambda x:x.hour)
+    data['year'] = data['date'].apply(lambda x:x.year)
+    data['dayofyear'] = data['date'].apply(lambda x:x.dayofyear)
+       
     
     del data['date']
+    #del data['dayofyear']
     del data['month']
-    del data['weekday0']
-    del data['year0']
-    #del data['hour0']
+    #del data['weekday']
+    #del data['year']
+    #del data['hour']
     #del data['weekend']
-    #del data['notWeekend']
-    del data['A']
-    del data['B']
-    del data['C']
-    del data['D']
-    del data['E']
-    del data['F']
+    del data['notWeekend']
+    #del data['A']
+    #del data['B']
+    #del data['C']
+    #del data['D']
+    #del data['E']
+    #del data['F']
     
     
     return data
 
 
+def apply_polynominals(X, column, p=30):
+    for i in range(2, p + 1):
+        X['%s^%d' % (column, i)] = np.power(X[column], i)
+  
+    
 def transformFeatures(X):
-    gradHour=30
-    for i in range(1,gradHour):
-        X[ 'hour'+str(i)] = X['hour0']*X['hour'+str(i-1)]
-    gradWeekday=3
-    for i in range(1,gradWeekday):
-        X[ 'weekday'+str(i)] = X['weekday0']*X['weekday'+str(i-1)]
-    gradYear=3
-    for i in range(1,gradYear):
-        X[ 'year'+str(i)] = X['year0']*X['year'+str(i-1)]
+    
+    apply_polynominals(X, 'hour', 30)
+    apply_polynominals(X, 'weekend', 1)
     
     for col in X.columns:
         std=np.std(X[col])
@@ -85,21 +84,21 @@ def logscore(gtruth, pred):
     return np.sqrt(np.mean(np.square(logdif)))
  
 
-def linregTrans():
-    estimators = [('poly', PolynomialFeatures(10)),  ('linear', LinearRegression())]    
-    regressor = Pipeline(estimators)    
+def linregTrans():   
+    regressor = LinearRegression()  
     regressor.fit(Xtrain,np.log(Ytrain))
     
     Ypred = np.array(regressor.predict(Xtest),dtype=float) 
     
     print logscore( Ytest, np.exp(Ypred ) )
     
-    validate = load_data('validate')
-    np.savetxt('results/validate.txt', np.exp( np.array( regressor.predict(validate), dtype=float) ) )
+    Xvalidate = load_data('validate')
+    Xvalidate = transformFeatures(Xvalidate)
+    np.savetxt('results/validate.txt', np.exp(regressor.predict(Xvalidate)))
  
 
 X = load_data('train')
-#X=transformFeatures(X)
+X = transformFeatures(X)
 Y = pd.read_csv('data/train_y.csv',
                 index_col=False,
                 header=None,
