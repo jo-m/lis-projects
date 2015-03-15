@@ -29,11 +29,11 @@
 \maketitle
 \section*{Project 1 : Regression}
 
-In our project for passenger number prediction we use Linear Regression.
+The task given in the Project was to predict passenger number given time stamps and other (unknown) data features. Linear Regression (or some variant thereof) had to be used to complete the task. First, the time stamps had to be parsed to be able to use components like e.g. year, hour, and minute.
 
-The most important step is feature engineering. We use the method transformFeatures for this.
+As we noticed, the most important step is feature engineering, which means transforming and combining different data features to achieve a better result. In our code, this is done in the Python Method \textit{transformFeatures}.
 
-We noticed from the data distribution that the Y values depend greatly on hours data features. It should not be a big surprise as the data presented are passenger numbers.
+We noticed from the data distribution that the Y values depend greatly on the train departure hour. It should not be a big surprise as the data presented are passenger numbers.
 Figure 1 shows this dependency.
 
 \begin{figure}[h]
@@ -55,26 +55,24 @@ Figure 1 shows this dependency.
 
 Additionally we use other features such as month, year, day of year and the factors A-F.
 
-
 \begin{wrapfigure}{r}{0.4\textwidth}
 \includegraphics[width=0.9\linewidth]{Plots/weekdays} 
 \caption{Y values sorted by weekdays}
-\end{wrapfigure} We construct our feature vectors for hour values with monomials of the degree up to 5. Combining hour values and minutes did not give any score gain.
+\end{wrapfigure} We construct our feature vectors for hour values with monomials of the degree up to 5. Using minutes did not give any gain, hours seem to be precise enough. Other features like year and month were transformed using polynomials, too.
 
-The weekdays were divided in two bins. The working days and the weekend. The working days had generally more passengers during the day than the weekends as the Figure 2 shows. We also noticed that half of the data was on the weekends. We tried to use this knowledge and weight the data points on the working days higher. However this approach did not produce any substantial results. 
-\clearpage
+We introduced a new True/False feature for the difference between weekends and weekdays. The working days had generally more passengers during the day than the weekends as the Figure 2 shows. We also noticed that half of the data was on the weekends. We tried to use this knowledge and weight the data points on the working days higher. However this approach did not produce much better results. 
+
 
 \begin{wrapfigure}{r}{0.4\textwidth}
 \includegraphics[width=0.9\linewidth]{Plots/data_sorted} 
 \caption{Y data sorted by value}
 \end{wrapfigure}
  
-Other important point to make is that the data is roughly exponentially distributed. This can be seen on the Figure 3. For the fitting we took therefore the logarithm of the values. This allowed for better linear regression and considerable predication accuracy gain. The predicted values had then to be transformed back with exponential function in order to get the actual approximation. This step also takes care of the negative values.
+Another important point to make is that the data is roughly exponentially distributed. This can be seen on Figure 3. For the fitting we therefore took the logarithm of the values. This allowed for better linear regression and considerable predication accuracy gain. The predicted values had then to be transformed back using the exponential function in order to get the actual approximation. This step also takes care of the problem of negative values occurring in the prediction.
 
 Combing features together we achieved further improvement. To capture the correlation between hours and other factors we produced several feature vectors consisting of the products of hour vector and other features. These vectors were also expanded to monomials of the degree up to 5. 
 
 The last step was to normalize the feature vectors. This was done per feature vector by subtracting the mean and dividing by the standard deviation.
 
-For our regression several loss functions have been tried.
-Ridge Regression and Lasso Regression both performed the same as the Linear Regression. Grid search for best coefficient alpha gave zero as the best alpha value. 
+we tried out several variants of linear regressions employing different penalty functions, like Ridge and Lasso regression in order to amend our results. We now use Ridge regression with an alpha penalty parameter value of 1.
 \end{document}
