@@ -1,4 +1,7 @@
 report.log
 report.aux
 report.pdf
-
+report.bbl
+report.blg
+report.out
+report.synctex.gz
