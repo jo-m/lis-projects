@@ -22,3 +22,5 @@ Xtrain, Xtest, Ytrain, Ytest = train_test_split_pd(X, Y, train_size=.8)
 
 print Xtrain.shape
 print Ytrain.shape
+
+write_Y('all', Ytest)

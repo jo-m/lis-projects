@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 import pandas as pd
+import numpy as np
 import sklearn.cross_validation as skcv
 
 
@@ -37,3 +38,9 @@ def load_Y(fname):
                        index_col=False,
                        header=None,
                        names=['y1', 'y2'])
+
+
+def write_Y(fname, Y):
+    if Y.shape[1] != 2:
+        raise 'Y has ivalid shape!'
+    np.savetxt('results/%s.txt' % fname, Y)
