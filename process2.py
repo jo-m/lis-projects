@@ -32,9 +32,8 @@ def pred(X, clf1, clf2):
     y2 = clf2.predict(X)
     return pd.DataFrame(dict(y1=y1, y2=y2))
 
-print 'n_estimators=50'
-clf1 = ensemble.RandomForestClassifier(n_estimators=50)
-clf2 = ensemble.RandomForestClassifier(n_estimators=50)
+clf1 = neighbors.KNeighborsClassifier(7, weights='distance', leaf_size=50)
+clf2 = neighbors.KNeighborsClassifier(3, weights='distance', leaf_size=50)
 train(Xtrain, Ytrain, clf1, clf2)
 
 # calculate score with test set
