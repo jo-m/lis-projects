@@ -32,8 +32,9 @@ def pred(X, clf1, clf2):
     y2 = clf2.predict(X)
     return pd.DataFrame(dict(y1=y1, y2=y2))
 
-clf1 = ensemble.RandomForestClassifier(n_estimators=10)
-clf2 = ensemble.RandomForestClassifier(n_estimators=10)
+print 'n_estimators=50'
+clf1 = ensemble.RandomForestClassifier(n_estimators=50)
+clf2 = ensemble.RandomForestClassifier(n_estimators=50)
 train(Xtrain, Ytrain, clf1, clf2)
 
 # calculate score with test set
