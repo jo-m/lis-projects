@@ -12,7 +12,7 @@ from lib import *
 
 X = load_X('train')
 Y = load_Y('train')
-Xtrain, Xtest, Ytrain, Ytest = train_test_split_pd(X, Y, train_size=.003)
+Xtrain, Xtest, Ytrain, Ytest = train_test_split_pd(X, Y, train_size=.1)
 print 'Training data: ', Xtrain.shape, Ytrain.shape
 print 'Test data: ', Xtest.shape, Ytest.shape
 
