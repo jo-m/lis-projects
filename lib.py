@@ -43,7 +43,7 @@ def load_Y(fname):
 def write_Y(fname, Y):
     if Y.shape[1] != 2:
         raise 'Y has invalid shape!'
-    np.savetxt('results/%s.txt' % fname, Y)
+    np.savetxt('results/%s_y_pred.txt' % fname, Y, fmt='%d', delimiter=',')
 
 
 def score(Ytruth, Ypred):
