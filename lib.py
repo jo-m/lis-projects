@@ -42,16 +42,15 @@ def load_Y(fname):
 
 def write_Y(fname, Y):
     if Y.shape[1] != 2:
-        raise 'Y has ivalid shape!'
+        raise 'Y has invalid shape!'
     np.savetxt('results/%s.txt' % fname, Y)
 
 
-def sumscore(gTruth, pred):
-    gTruth = np.array(gTruth, dtype=float)
-    pred = np.array(pred, dtype=float)
-    size = gTruth.shape[0]  # numb of rows
-    sumY1 = np.sum(np.array(gTruth[0] != pred[0]))
-    sumY2 = np.sum(np.array(gTruth[1] != pred[1]))
-    return float((sumY1 + sumY2)) / size / 2
+def score(Ytruth, Ypred):
+    if Ytruth.shape[1] != 2:
+        raise 'Ytruth has invalid shape!'
+    if Ypred.shape[1] != 2:
+        raise 'Ypred has invalid shape!'
 
-
+    sum = (Ytruth != Ypred).astype(float).sum().sum()
+    return sum / np.product(Ytruth.shape)
