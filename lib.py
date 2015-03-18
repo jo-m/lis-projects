@@ -50,8 +50,8 @@ def sumscore(gTruth, pred):
     gTruth = np.array(gTruth, dtype=float)
     pred = np.array(pred, dtype=float)
     size = gTruth.shape[0]  # numb of rows
-    sumY1 = np.sum(gTruth[0] != pred[0])
-    sumY2 = np.sum(gTruth[1] != pred[1])
-    return (sumY1 + sumY2)/size/2
+    sumY1 = np.sum(np.array(gTruth[0] != pred[0]))
+    sumY2 = np.sum(np.array(gTruth[1] != pred[1]))
+    return float((sumY1 + sumY2)) / size / 2
 
 
