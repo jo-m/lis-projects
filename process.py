@@ -33,10 +33,11 @@ clf1 = svm.SVC(kernel='linear')
 clf2 = svm.SVC(kernel='linear')
 train(Xtrain, Ytrain, clf1, clf2)
 
-# validate with test set
+# calculate score with test set
 Ypred = pred(Xtest, clf1, clf2)
 print 'Score:', score(Ytest, Ypred), 'Grade: ', grade(score(Ytest, Ypred))
 
+# load, predict, write validation set
 Xvalidate = load_X('validate')
 Yvalidate = pred(Xvalidate, clf1, clf2)
 write_Y('validate', Yvalidate)
