@@ -54,3 +54,14 @@ def score(Ytruth, Ypred):
 
     sum = (Ytruth != Ypred).astype(float).sum().sum()
     return sum / np.product(Ytruth.shape)
+
+
+def grade(score):
+    BE = 0.3091365975175955
+    BH = 0.1568001421417719
+    if score > BE:
+        return 0
+    elif score <= BH:
+        return 100
+    else:
+        return (1 - (score - BH) / (BE - BH)) * 50 + 50
