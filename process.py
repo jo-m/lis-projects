@@ -52,7 +52,7 @@ def testset_validate(clf):
 
 
 def cross_validate(clf):
-    scores = skcv.cross_val_score(clf, X, Y, cv=5,
+    scores = skcv.cross_val_score(clf, X, Y, cv=5, n_jobs=-1,
                                   scoring=skmet.make_scorer(score))
     print 'C-V score = %.4f ± %.4f Grade = %d%%' % \
         (np.mean(scores), np.std(scores), grade(np.mean(scores)))
