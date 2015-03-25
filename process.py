@@ -11,9 +11,8 @@ from lib import *
 
 
 def preprocess_features(X):
-    scl = skpre.StandardScaler()
     del X['B']
-    X = scl.fit_transform(X)
+    X = skpre.StandardScaler().fit_transform(X)
 
 
 class UseY1Classifier(object):

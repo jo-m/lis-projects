@@ -28,6 +28,7 @@ def load_X(fname):
     names += ['L%02d' % i for i in range(1, 40 + 1)]
     data = pd.read_csv('data/%s.csv' % fname,
                        index_col=False,
+                       dtype=np.float64,
                        header=None,
                        names=names)
     return data
