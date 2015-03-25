@@ -10,7 +10,8 @@ import sklearn.preprocessing as skpre
 from lib import *
 
 
-X, Y = load_X('train'), load_Y('train')
+def preprocess_features(X):
+    del X['B']
 
 
 class UseY1Classifier(object):
@@ -52,7 +53,7 @@ def testset_validate(clf):
 
 
 def cross_validate(clf):
-    scores = skcv.cross_val_score(clf, X, Y, cv=5, n_jobs=-1,
+    scores = skcv.cross_val_score(clf, X, Y, cv=8, n_jobs=-1,
                                   scoring=skmet.make_scorer(score))
     print 'C-V score = %.4f ± %.4f Grade = %d%%' % \
         (np.mean(scores), np.std(scores), grade(np.mean(scores)))
@@ -61,11 +62,14 @@ def cross_validate(clf):
 def predict_validation_set(clf):
     clf.fit(X, Y)
     Xvalidate = load_X('validate')
+    preprocess_features(Xvalidate)
     Yvalidate = clf.predict(Xvalidate)
     write_Y('validate', Yvalidate)
 
+X, Y = load_X('train'), load_Y('train')
+preprocess_features(X)
+
+clf = UseY1Classifier(50)
 testset_validate(clf)
+cross_validate(clf)
 predict_validation_set(clf)
-for x in np.linspace(10, 300, 10):
-    print int(x), '->\n    ',
-    cross_validate(UseY1Classifier(int(x)))
