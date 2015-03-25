@@ -14,8 +14,9 @@ X, Y = load_X('train'), load_Y('train')
 
 
 class UseY1Classifier(object):
-    clf1 = skens.RandomForestClassifier(n_estimators=50)
-    clf2 = skens.RandomForestClassifier(n_estimators=50)
+    def __init__(self, n_est=100):
+        self.clf1 = skens.RandomForestClassifier(n_estimators=n_est)
+        self.clf2 = skens.RandomForestClassifier(n_estimators=n_est)
 
     def _trans_y(self, y):
         y = np.atleast_2d(y).T
@@ -41,8 +42,6 @@ class UseY1Classifier(object):
     def get_params(self, *x, **xx):
         return {}
 
-clf = UseY1Classifier()
-
 
 def testset_validate(clf):
     Xtrain, Xtest, Ytrain, Ytest = train_test_split_pd(X, Y, train_size=.8)
@@ -66,5 +65,7 @@ def predict_validation_set(clf):
     write_Y('validate', Yvalidate)
 
 testset_validate(clf)
-cross_validate(clf)
 predict_validation_set(clf)
+for x in np.linspace(10, 300, 10):
+    print int(x), '->\n    ',
+    cross_validate(UseY1Classifier(int(x)))
