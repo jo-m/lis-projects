@@ -9,7 +9,23 @@ from lib import *
 
 
 X, Y = load_X('train'), load_Y('train')
-clf = skens.RandomForestClassifier(n_estimators=50)
+
+
+class UseY1Classifier(object):
+    clf1 = skens.RandomForestClassifier(n_estimators=50)
+    clf2 = skens.RandomForestClassifier(n_estimators=50)
+
+    def fit(self, *x, **xx):
+        self.clf1.fit(*x, **xx)
+        return self
+
+    def predict(self, *x, **xx):
+        return self.clf1.predict(*x, **xx)
+
+    def get_params(self, *x, **xx):
+        return {}
+
+clf = UseY1Classifier()
 
 
 def testset_validate(clf):
