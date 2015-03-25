@@ -1,22 +1,30 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-from sklearn import ensemble
+import sklearn.ensemble as skens
+import sklearn.cross_validation as skcv
+import sklearn.metrics as skmet
 
 from lib import *
 
 
 X, Y = load_X('train'), load_Y('train')
-Xtrain, Xtest, Ytrain, Ytest = train_test_split_pd(X, Y, train_size=.8)
-print 'Training data: ', Xtrain.shape, Ytrain.shape
-print 'Test data: ', Xtest.shape, Ytest.shape
+clf = skens.RandomForestClassifier(n_estimators=50)
 
-clf = ensemble.RandomForestClassifier(n_estimators=50)
-clf.fit(Xtrain, Ytrain)
 
-# calculate score with test set
-Ypred = clf.predict(Xtest)
-print 'Score:', score(Ytest, Ypred), 'Grade: %d%%' % grade(score(Ytest, Ypred))
+def testset_validate(clf):
+    Xtrain, Xtest, Ytrain, Ytest = train_test_split_pd(X, Y, train_size=.8)
+    clf.fit(Xtrain, Ytrain)
+    Ypred = clf.predict(Xtest)
+    sc = score(Ytest, Ypred)
+    print 'Testset score = %.4f Grade = %d%%' % (sc, grade(sc))
+
+
+def cross_validate(clf):
+    scores = skcv.cross_val_score(clf, X, Y, cv=5,
+                                  scoring=skmet.make_scorer(score))
+    print 'C-V score = %.4f ± %.4f Grade = %d%%' % \
+        (np.mean(scores), np.std(scores), grade(np.mean(scores)))
 
 
 def predict_validation_set(clf):
@@ -27,4 +35,6 @@ def predict_validation_set(clf):
     Yvalidate = clf.predict(Xvalidate)
     write_Y('validate', Yvalidate)
 
+testset_validate(clf)
+cross_validate(clf)
 predict_validation_set(clf)
