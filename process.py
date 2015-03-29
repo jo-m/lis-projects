@@ -41,20 +41,18 @@ class UseY1Classifier(object):
         # append y1 to X
         X_y1 = np.concatenate([X, self._binarize(Y[:, 0])], axis=1)
 
-        # transform
+        # normalize
+        X_y1 = skpre.StandardScaler().fit_transform(X_y1)
+        X = skpre.StandardScaler().fit_transform(X)
+
         # reduce number of features
         self.trsf1.fit(X, Y[:, 0])
         self.trsf2.fit(X_y1, Y[:, 1])
-
         old = X.shape[1], X_y1.shape[1]
         X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
         X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
         print 'y1: %d to %d, y2: %d to %d' % \
             (old[0], X_for_y1.shape[1], old[1], X_for_y2.shape[1])
-
-        # normalize
-        X_for_y1 = skpre.StandardScaler().fit_transform(X_for_y1)
-        X_for_y2 = skpre.StandardScaler().fit_transform(X_for_y2)
 
         # fit X vs y1
         self.clf1.fit(X_for_y1, Y[:, 0])
@@ -63,14 +61,17 @@ class UseY1Classifier(object):
         return self
 
     def predict(self, X):
+        # normalize, reduce number of features
+        X = skpre.StandardScaler().fit_transform(X)
         X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
-        X_for_y1 = skpre.StandardScaler().fit_transform(X_for_y1)
 
         # pred y1 from X
         y1 = self.clf1.predict(X_for_y1)
+
+        # add y1 to X, reduce number of features, normalize
         X_y1 = np.concatenate([X, self._binarize(y1)], axis=1)
-        X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
-        X_for_y2 = skpre.StandardScaler().fit_transform(X_for_y2)
+        X_for_y2 = skpre.StandardScaler().fit_transform(X_y1)
+        X_for_y2 = self.trsf2.transform(X_for_y2, threshold=self.threshold)
         # pred y2 from X + y1
         y2 = self.clf2.predict(X_for_y2)
         return np.vstack([y1, y2]).T
