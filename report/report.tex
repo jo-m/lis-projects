@@ -37,12 +37,29 @@ First we tried to work on a even smaller training set then we had, to decrease t
 Therefore we had to try out other classification methods and finally concluded that the Random Forest Classifier delivered us the best results. Moreover it has a complexity of $\mathcal{O}(nfeatures)$ which eliminated our initial concern about the run time.
 
 For further tuning our solution we used that one class is dependent of the other. So we used Random the Forest Classifier to predict one Class and the expanded the feature space by resulting label. 
-(zeile 34 - 53 in process.py, commit b27a895)
+%(zeile 34 - 53 in process.py, commit b27a895)
 
 With help of OneHotEncoder we also used binarization to vectorize the labels of the training data. Which again increased our precision.
 
 One of the biggest problems in machine learning is over fitting, which also showed in this project. Namely, we used cross validation to optimize our parameters of SMV and easily got a better result than the hard baseline. But when we validated the test set on our project website, we did not even come close to the hard base line.
 
+Figure \ref{fig:hist} shows a histogram of what a label should be and what we predicted.
+
+%-------------------------------------------------- 
+\begin{figure}[h]
+ 
+\begin{subfigure}[l]{0.5\textwidth}
+\includegraphics[width=0.9\linewidth, height=5cm]{pic/histy1.png} 
+\caption{First Class}
+\end{subfigure}
+\begin{subfigure}[r]{0.5\textwidth}
+\includegraphics[width=0.9\linewidth, height=5cm]{pic/histy2.png}
+\caption{Second Class}
+\end{subfigure}
+ 
+\caption{Histogram of real label and predicted label}
+\label{fig:hist}
+\end{figure}
 
 
 
