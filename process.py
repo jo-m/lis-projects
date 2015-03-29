@@ -12,15 +12,20 @@ from lib import *
 
 def preprocess_features(X):
     del X['B']
+    # normalize
     X = skpre.StandardScaler().fit_transform(X)
 
 
 class UseY1Classifier(object):
     def __init__(self, n_est=100):
+        # we need 2 separate classifiers
         self.clf1 = skens.RandomForestClassifier(n_estimators=n_est)
         self.clf2 = skens.RandomForestClassifier(n_estimators=n_est)
 
     def _trans_y(self, y):
+        """
+        Binarize y1 so we can use it for prediciton of y2
+        """
         y = np.atleast_2d(y).T
         enc = skpre.OneHotEncoder(sparse=False)
         enc.fit(y)
@@ -28,16 +33,22 @@ class UseY1Classifier(object):
 
     def fit(self, X, Y):
         if isinstance(Y, pd.DataFrame):
+            # make a numpy ndarray out of pandas dataframe
             Y = Y.as_matrix()
             X = X.as_matrix()
+        # append y1 to X
         X_y1 = np.concatenate([X, self._trans_y(Y[:, 0])], axis=1)
+        # fit X vs y1
         self.clf1.fit(X, Y[:, 0])
+        # fit X + y1 vs y2
         self.clf2.fit(X_y1, Y[:, 1])
         return self
 
     def predict(self, X):
+        # pred y1 from X
         y1 = self.clf1.predict(X)
         X_y1 = np.concatenate([X, self._trans_y(y1)], axis=1)
+        # pred y2 from X + y1
         y2 = self.clf2.predict(X_y1)
         return np.vstack([y1, y2]).T
 
