@@ -2,9 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 import pandas as pd
-import sklearn.cross_validation as skcv
 import sklearn.ensemble as skens
-import sklearn.metrics as skmet
 import sklearn.preprocessing as skpre
 
 from lib import *
@@ -94,13 +92,6 @@ def testset_validate(clf):
     print 'Testset score = %.4f Grade = %d%%' % (sc, grade(sc))
 
 
-def cross_validate(clf):
-    scores = skcv.cross_val_score(clf, X, Y, cv=8, n_jobs=-1,
-                                  scoring=skmet.make_scorer(score))
-    print 'C-V score = %.4f ± %.4f Grade = %d%%' % \
-        (np.mean(scores), np.std(scores), grade(np.mean(scores)))
-
-
 def predict_validation_set(clf):
     clf.fit(X, Y)
     Xvalidate = load_X('validate')
@@ -113,5 +104,4 @@ preprocess_features(X)
 
 clf = UseY1Classifier()
 testset_validate(clf)
-cross_validate(clf)
 predict_validation_set(clf)
