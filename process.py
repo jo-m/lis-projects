@@ -22,14 +22,12 @@ class UseY1Classifier(object):
         self.clf1 = skens.RandomForestClassifier(n_estimators=n_est)
         self.clf2 = skens.RandomForestClassifier(n_estimators=n_est)
 
+        # random forests to throw out unimportant features
         self.threshold = threshold
         self.trsf1 = skens.RandomForestClassifier(n_estimators=n_est)
         self.trsf2 = skens.RandomForestClassifier(n_estimators=n_est)
 
-    def _trans_y(self, y):
-        """
-        Binarize y1 so we can use it for prediciton of y2
-        """
+    def _binarize(self, y):
         y = np.atleast_2d(y).T
         enc = skpre.OneHotEncoder(sparse=False)
         enc.fit(y)
@@ -41,9 +39,10 @@ class UseY1Classifier(object):
             Y = Y.as_matrix()
             X = X.as_matrix()
         # append y1 to X
-        X_y1 = np.concatenate([X, self._trans_y(Y[:, 0])], axis=1)
+        X_y1 = np.concatenate([X, self._binarize(Y[:, 0])], axis=1)
 
         # transform
+        # reduce number of features
         self.trsf1.fit(X, Y[:, 0])
         self.trsf2.fit(X_y1, Y[:, 1])
 
@@ -69,7 +68,7 @@ class UseY1Classifier(object):
 
         # pred y1 from X
         y1 = self.clf1.predict(X_for_y1)
-        X_y1 = np.concatenate([X, self._trans_y(y1)], axis=1)
+        X_y1 = np.concatenate([X, self._binarize(y1)], axis=1)
         X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
         X_for_y2 = skpre.StandardScaler().fit_transform(X_for_y2)
         # pred y2 from X + y1
