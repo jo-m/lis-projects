@@ -28,6 +28,14 @@ class UseY1Classifier(object):
         self.trsf1 = skens.RandomForestClassifier(n_estimators=self.n_est)
         self.trsf2 = skens.RandomForestClassifier(n_estimators=self.n_est)
 
+    def get_wgth(self, y):
+        e_count = np.bincount(y)
+        if e_count.shape[0] > 4:
+            e_count = e_count[1:8]
+        up = np.atleast_2d(np.max(e_count) / e_count)
+        weights = up[0, y - 1]
+        return weights
+
     def _binarize(self, y):
         y = np.atleast_2d(y).T
         enc = skpre.OneHotEncoder(sparse=False)
@@ -53,9 +61,9 @@ class UseY1Classifier(object):
         X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold_y2)
 
         # fit X vs y1
-        self.clf1.fit(X_for_y1, Y[:, 0])
+        self.clf1.fit(X_for_y1, Y[:, 0], sample_weight=self.get_wgth(Y[:, 0]))
         # fit X + y1 vs y2
-        self.clf2.fit(X_for_y2, Y[:, 1])
+        self.clf2.fit(X_for_y2, Y[:, 1], sample_weight=self.get_wgth(Y[:, 1]))
         return self
 
     def predict(self, X):
