@@ -30,18 +30,20 @@
 
 \section*{Project 2 : Two-Label Classification}
 
-The Task given in the Project was to solve a multi-label multi-class classification problem. Our data was extracted from bio medical images with image processing techniques.
+The Task given in the project was to solve a multi-label multi-class classification problem. The data provided to us was extracted from bio medical images with image processing techniques.
 
-First we tried to work on a even smaller training set then we had, to decrease the run time in further steps. ($<1$\%) With this new set we reached a hit ratio of 0.35 by using a Support Vector Machine algorithm. After tuning the parameters, we started to increase the size of our subset of the training set, but the result did not improve.
+We started using Support Vector Machine classifiers. Because of their slowness, we used only $<1$\% of the provided data in the beginning. This was enough to reach a score of 0.35. After tuning the parameters, we started to increase the size of our subset of the training set, but the result did not improve much given the much greater execution time.
 
-Therefore we had to try out other classification methods and finally concluded that the Random Forest Classifier delivered us the best results. Moreover it has a complexity of $\mathcal{O}(nfeatures)$ which eliminated our initial concern about the run time.
+Therefore we had to try out other classification methods and finally concluded that the Random Forest Classifier delivered the best results. Moreover its runtime scales with $\mathcal{O}(nfeatures)$ which eliminated our initial concern about the run time.
 
-For further tuning our solution we used that one class is dependent of the other. So we used Random the Forest Classifier to predict one Class and the expanded the feature space by resulting label. 
+For further tuning of our solution, we used that one class is dependent of the other. So we used the Random Forest Classifier to predict one Class and the expanded the feature space by the resulting label. 
 %(zeile 34 - 53 in process.py, commit b27a895)
 
-With help of OneHotEncoder we also used binarization to vectorize the labels of the training data. Which again increased our precision.
+With help of OneHotEncoder we also used binarization for the labels of the training data, which again increased our precision.
 
-One of the biggest problems in machine learning is over fitting, which also showed in this project. Namely, we used cross validation to optimize our parameters of SMV and easily got a better result than the hard baseline. But when we validated the test set on our project website, we did not even come close to the hard base line.
+Another score amendement was reached by weighting the classes and giving this information to the classifier (some labels appear more often than others).
+
+One of the biggest problems in machine learning is overfitting, which also showed in this project. Namely, we used cross validation and easily got a better result than the hard baseline. But when we validated the test set on the project website validation set), we did not even come close to the hard base line.
 
 Figure \ref{fig:hist} shows a histogram of what a label should be and what we predicted.
 
