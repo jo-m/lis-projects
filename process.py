@@ -105,7 +105,7 @@ def predict_validation_set(clf):
 X, Y = load_X('train'), load_Y('train')
 preprocess_features(X)
 
-clf = UseY1Classifier(50)
+clf = UseY1Classifier(50, '0.08*mean')
 testset_validate(clf)
 cross_validate(clf)
 predict_validation_set(clf)
