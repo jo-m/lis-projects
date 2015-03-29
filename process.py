@@ -12,8 +12,6 @@ from lib import *
 
 def preprocess_features(X):
     del X['B']
-    # normalize
-    X = skpre.StandardScaler().fit_transform(X)
 
 
 class UseY1Classifier(object):
@@ -55,6 +53,10 @@ class UseY1Classifier(object):
         print 'y1: %d to %d, y2: %d to %d' % \
             (old[0], X_for_y1.shape[1], old[1], X_for_y2.shape[1])
 
+        # normalize
+        X_for_y1 = skpre.StandardScaler().fit_transform(X_for_y1)
+        X_for_y2 = skpre.StandardScaler().fit_transform(X_for_y2)
+
         # fit X vs y1
         self.clf1.fit(X_for_y1, Y[:, 0])
         # fit X + y1 vs y2
@@ -63,11 +65,13 @@ class UseY1Classifier(object):
 
     def predict(self, X):
         X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
+        X_for_y1 = skpre.StandardScaler().fit_transform(X_for_y1)
 
         # pred y1 from X
         y1 = self.clf1.predict(X_for_y1)
         X_y1 = np.concatenate([X, self._trans_y(y1)], axis=1)
         X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
+        X_for_y2 = skpre.StandardScaler().fit_transform(X_for_y2)
         # pred y2 from X + y1
         y2 = self.clf2.predict(X_for_y2)
         return np.vstack([y1, y2]).T
