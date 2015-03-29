@@ -17,10 +17,16 @@ def preprocess_features(X):
 
 
 class UseY1Classifier(object):
-    def __init__(self, n_est=100):
+    threshold = None
+
+    def __init__(self, n_est=100, threshold='mean'):
         # we need 2 separate classifiers
         self.clf1 = skens.RandomForestClassifier(n_estimators=n_est)
         self.clf2 = skens.RandomForestClassifier(n_estimators=n_est)
+
+        self.threshold = threshold
+        self.trsf1 = skens.RandomForestClassifier(n_estimators=n_est)
+        self.trsf2 = skens.RandomForestClassifier(n_estimators=n_est)
 
     def _trans_y(self, y):
         """
@@ -38,18 +44,32 @@ class UseY1Classifier(object):
             X = X.as_matrix()
         # append y1 to X
         X_y1 = np.concatenate([X, self._trans_y(Y[:, 0])], axis=1)
+
+        # transform
+        self.trsf1.fit(X, Y[:, 0])
+        self.trsf2.fit(X_y1, Y[:, 1])
+
+        old = X.shape[1], X_y1.shape[1]
+        X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
+        X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
+        print 'y1: %d to %d, y2: %d to %d' % \
+            (old[0], X_for_y1.shape[1], old[1], X_for_y2.shape[1])
+
         # fit X vs y1
-        self.clf1.fit(X, Y[:, 0])
+        self.clf1.fit(X_for_y1, Y[:, 0])
         # fit X + y1 vs y2
-        self.clf2.fit(X_y1, Y[:, 1])
+        self.clf2.fit(X_for_y2, Y[:, 1])
         return self
 
     def predict(self, X):
+        X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
+
         # pred y1 from X
-        y1 = self.clf1.predict(X)
+        y1 = self.clf1.predict(X_for_y1)
         X_y1 = np.concatenate([X, self._trans_y(y1)], axis=1)
+        X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
         # pred y2 from X + y1
-        y2 = self.clf2.predict(X_y1)
+        y2 = self.clf2.predict(X_for_y2)
         return np.vstack([y1, y2]).T
 
     def get_params(self, *x, **xx):
