@@ -15,17 +15,18 @@ def preprocess_features(X):
 
 
 class UseY1Classifier(object):
-    threshold = None
+    threshold_y1 = "0.08*mean"
+    threshold_y2 = "0.06*mean"
+    n_est = 200
 
-    def __init__(self, n_est=100, threshold='mean'):
+    def __init__(self):
         # we need 2 separate classifiers
-        self.clf1 = skens.RandomForestClassifier(n_estimators=n_est)
-        self.clf2 = skens.RandomForestClassifier(n_estimators=n_est)
+        self.clf1 = skens.RandomForestClassifier(n_estimators=self.n_est)
+        self.clf2 = skens.RandomForestClassifier(n_estimators=self.n_est)
 
         # random forests to throw out unimportant features
-        self.threshold = threshold
-        self.trsf1 = skens.RandomForestClassifier(n_estimators=n_est)
-        self.trsf2 = skens.RandomForestClassifier(n_estimators=n_est)
+        self.trsf1 = skens.RandomForestClassifier(n_estimators=self.n_est)
+        self.trsf2 = skens.RandomForestClassifier(n_estimators=self.n_est)
 
     def _binarize(self, y):
         y = np.atleast_2d(y).T
@@ -48,11 +49,8 @@ class UseY1Classifier(object):
         # reduce number of features
         self.trsf1.fit(X, Y[:, 0])
         self.trsf2.fit(X_y1, Y[:, 1])
-        old = X.shape[1], X_y1.shape[1]
-        X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
-        X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold)
-        print 'y1: %d to %d, y2: %d to %d' % \
-            (old[0], X_for_y1.shape[1], old[1], X_for_y2.shape[1])
+        X_for_y1 = self.trsf1.transform(X, threshold=self.threshold_y1)
+        X_for_y2 = self.trsf2.transform(X_y1, threshold=self.threshold_y2)
 
         # fit X vs y1
         self.clf1.fit(X_for_y1, Y[:, 0])
@@ -63,7 +61,7 @@ class UseY1Classifier(object):
     def predict(self, X):
         # normalize, reduce number of features
         X = skpre.StandardScaler().fit_transform(X)
-        X_for_y1 = self.trsf1.transform(X, threshold=self.threshold)
+        X_for_y1 = self.trsf1.transform(X, threshold=self.threshold_y1)
 
         # pred y1 from X
         y1 = self.clf1.predict(X_for_y1)
@@ -71,7 +69,7 @@ class UseY1Classifier(object):
         # add y1 to X, reduce number of features, normalize
         X_y1 = np.concatenate([X, self._binarize(y1)], axis=1)
         X_for_y2 = skpre.StandardScaler().fit_transform(X_y1)
-        X_for_y2 = self.trsf2.transform(X_for_y2, threshold=self.threshold)
+        X_for_y2 = self.trsf2.transform(X_for_y2, threshold=self.threshold_y2)
         # pred y2 from X + y1
         y2 = self.clf2.predict(X_for_y2)
         return np.vstack([y1, y2]).T
@@ -105,7 +103,7 @@ def predict_validation_set(clf):
 X, Y = load_X('train'), load_Y('train')
 preprocess_features(X)
 
-clf = UseY1Classifier(50, '0.08*mean')
+clf = UseY1Classifier()
 testset_validate(clf)
 cross_validate(clf)
 predict_validation_set(clf)
