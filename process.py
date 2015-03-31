@@ -19,17 +19,8 @@ class OurClassifier(object):
         self.clf = skens.RandomForestClassifier(n_estimators=self.n_est,
                                                 n_jobs=-1)
 
-    def get_wgth(self, y):
-        e_count = np.bincount(y)
-        if e_count.shape[0] > 4:
-            e_count = e_count[1:8]
-        up = np.atleast_2d(np.max(e_count) / e_count)
-        weights = up[0, y - 1]
-        return weights
-
     def fit(self, X, Y):
         X = skpre.StandardScaler().fit_transform(X)
-        # self.clf.fit(X, Y, sample_weight=self.get_wgth(Y))
         self.clf.fit(X, Y.ravel())
         return self
 

@@ -7,8 +7,10 @@ import numpy as np
 import h5py
 
 
-def to_ndarray(h5_arr):
-    arr = np.zeros(h5_arr.shape, dtype='float32')
+def to_ndarray(h5_arr, dtype=None):
+    if dtype is None:
+        dtype = h5_arr.dtype
+    arr = np.zeros(h5_arr.shape, dtype=dtype)
     h5_arr.read_direct(arr)
     return arr
 
@@ -16,7 +18,7 @@ def to_ndarray(h5_arr):
 def load_data(fname):
     f = h5py.File('data/%s.h5' % fname, 'r')
     if 'label' in f.keys():
-        return to_ndarray(f['data']), to_ndarray(f['label'])
+        return to_ndarray(f['data']), to_ndarray(f['label'], 'int8').ravel()
     else:
         return to_ndarray(f['data']), None
 
