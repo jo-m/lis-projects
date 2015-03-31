@@ -22,6 +22,7 @@ def load_data(fname):
 
 
 def write_Y(fname, Y):
+    Y = Y.ravel()
     if Y.ndim != 1:
         raise Exception('Y has invalid shape!')
     if Y.dtype != 'int32':
@@ -31,6 +32,8 @@ def write_Y(fname, Y):
 
 
 def score(Ytruth, Ypred):
+    Ytruth = Ytruth.ravel()
+    Ypred = Ypred.ravel()
     if Ytruth.ndim != 1:
         raise Exception('Ytruth has invalid shape!')
     if Ypred.ndim != 1:
