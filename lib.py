@@ -27,8 +27,6 @@ def write_Y(fname, Y):
     Y = Y.ravel()
     if Y.ndim != 1:
         raise Exception('Y has invalid shape!')
-    if Y.dtype != 'int32':
-        raise Exception('Y has invalid dtype!')
     np.savetxt('results/%s_y_pred.txt' % fname,
                Y, fmt=str('%d'), delimiter=',')
 

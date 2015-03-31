@@ -13,20 +13,33 @@ def preprocess_features(X):
 
 
 class OurClassifier(object):
-    n_est = 200
+    n_est = None
+    threshold = None
 
-    def __init__(self):
+    def __init__(self, n_est=10, threshold='1*mean'):
+        self.n_est = n_est
+        self.threshold = threshold
         self.clf = skens.RandomForestClassifier(n_estimators=self.n_est,
                                                 n_jobs=-1)
+        self.trsf = skens.RandomForestClassifier(n_estimators=self.n_est,
+                                                 n_jobs=-1)
 
     def fit(self, X, Y):
         X = skpre.StandardScaler().fit_transform(X)
-        self.clf.fit(X, Y.ravel())
+
+        self.trsf.fit(X, Y)
+        Xred = self.trsf.transform(X, threshold=self.threshold)
+
+        print 'X -> Xred: %d to %d' % \
+            (X.shape[1], Xred.shape[1])
+
+        self.clf.fit(Xred, Y)
         return self
 
     def predict(self, X):
         X = skpre.StandardScaler().fit_transform(X)
-        return self.clf.predict(X)
+        Xred = self.trsf.transform(X, threshold=self.threshold)
+        return self.clf.predict(Xred)
 
     def get_params(self, *x, **xx):
         return {}
@@ -51,6 +64,6 @@ def predict_validation_set(clf):
 X, Y = load_data('train')
 preprocess_features(X)
 
-clf = OurClassifier()
+clf = OurClassifier(threshold='2*mean')
 testset_validate(clf)
 predict_validation_set(clf)
