@@ -1,7 +1,19 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
+from __future__ import unicode_literals
 import numpy as np
+import h5py
+
+
+def load_data(fname):
+    f = h5py.File('data/%s.h5' % fname, 'r')
+    print f.name
+    print f.keys()
+    if 'label' in f.keys():
+        return f['data'], f['label']
+    else:
+        return f['data'], None
 
 
 def write_Y(fname, Y):

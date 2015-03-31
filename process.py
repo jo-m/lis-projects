@@ -1,4 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-print 'Hello world!'
+from lib import *
+
+X, Y = load_data('train')
+
+print X, Y
