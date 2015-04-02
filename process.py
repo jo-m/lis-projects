@@ -2,11 +2,13 @@
 # -*- encoding: utf-8 -*-
 
 import sklearn.cross_validation as skcv
-import sklearn.ensemble as skens
 import sklearn.metrics as skmet
 import sklearn.preprocessing as skpre
 
+import mlp
+
 from lib import *
+
 
 
 def preprocess_features(X):
@@ -20,27 +22,16 @@ class OurClassifier(object):
     def __init__(self, n_est=10, threshold='1*mean'):
         self.n_est = n_est
         self.threshold = threshold
-        self.clf = skens.RandomForestClassifier(n_estimators=self.n_est,
-                                                n_jobs=-1)
-        self.trsf = skens.RandomForestClassifier(n_estimators=self.n_est,
-                                                 n_jobs=-1)
+        self.clf = mlp.MLPClassifier()
 
     def fit(self, X, Y):
         X = skpre.StandardScaler().fit_transform(X)
-
-        self.trsf.fit(X, Y)
-        Xred = self.trsf.transform(X, threshold=self.threshold)
-
-        print 'X -> Xred: %d to %d' % \
-            (X.shape[1], Xred.shape[1])
-
-        self.clf.fit(Xred, Y)
+        self.clf.fit(X, Y)
         return self
 
     def predict(self, X):
         X = skpre.StandardScaler().fit_transform(X)
-        Xred = self.trsf.transform(X, threshold=self.threshold)
-        return self.clf.predict(Xred)
+        return self.clf.predict(X)
 
     def get_params(self, *x, **xx):
         return {}
@@ -48,7 +39,7 @@ class OurClassifier(object):
 
 def testset_validate(clf):
     Xtrain, Xtest, Ytrain, Ytest = \
-        skcv.train_test_split(X, Y, train_size=0.01)
+        skcv.train_test_split(X, Y, train_size=0.8)
     clf.fit(Xtrain, Ytrain)
     Ypred = clf.predict(Xtest)
     sc = score(Ytest, Ypred)
