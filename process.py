@@ -16,13 +16,8 @@ def preprocess_features(X):
 
 
 class OurClassifier(object):
-    n_est = None
-    threshold = None
-
-    def __init__(self, n_est=10, threshold='1*mean'):
-        self.n_est = n_est
-        self.threshold = threshold
-        self.clf = mlp.MLPClassifier()
+    def __init__(self, *x, **xx):
+        self.clf = mlp.MLPClassifier(*x, **xx)
 
     def fit(self, X, Y):
         X = skpre.StandardScaler().fit_transform(X)
@@ -63,7 +58,7 @@ def predict_validation_set(clf):
 X, Y = load_data('train')
 preprocess_features(X)
 
-clf = OurClassifier(threshold='2*mean')
+clf = OurClassifier(n_hidden=200)
 testset_validate(clf)
 predict_validation_set(clf)
 cross_validate(clf)
