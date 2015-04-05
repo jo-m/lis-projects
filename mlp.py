@@ -13,23 +13,28 @@ from sklearn.preprocessing import LabelBinarizer
 Stolen from https://gist.github.com/amueller/2061456
 """
 
+
 def _softmax(x):
     np.exp(x, x)
     x /= np.sum(x, axis=1)[:, np.newaxis]
 
+
 def _tanh(x):
     np.tanh(x, x)
+
 
 def _dtanh(x):
     """Derivative of tanh as a function of tanh."""
     x *= -x
     x += 1
 
+
 class BaseMLP(BaseEstimator):
     """Base class for estimators base on multi layer
     perceptrons."""
 
-    def __init__(self, n_hidden, lr, l2decay, loss, output_layer, batch_size, verbose=0):
+    def __init__(self, n_hidden, lr, l2decay, loss, output_layer,
+                 batch_size, verbose=0):
         self.n_hidden = n_hidden
         self.lr = lr
         self.l2decay = l2decay
@@ -38,27 +43,27 @@ class BaseMLP(BaseEstimator):
         self.verbose = verbose
 
         # check compatibility of loss and output layer:
-        if output_layer=='softmax' and loss!='cross_entropy':
-            raise ValueError('Softmax output is only supported '+
-                'with cross entropy loss function.')
-        if output_layer!='softmax' and loss=='cross_entropy':
+        if output_layer == 'softmax' and loss != 'cross_entropy':
+            raise ValueError('Softmax output is only supported ' +
+                             'with cross entropy loss function.')
+        if output_layer != 'softmax' and loss == 'cross_entropy':
             raise ValueError('Cross-entropy loss is only ' +
-                    'supported with softmax output layer.')
+                             'supported with softmax output layer.')
 
         # set output layer and loss function
-        if output_layer=='linear':
+        if output_layer == 'linear':
             self.output_func = id
-        elif output_layer=='softmax':
+        elif output_layer == 'softmax':
             self.output_func = _softmax
-        elif output_layer=='tanh':
+        elif output_layer == 'tanh':
             self.output_func = _tanh
         else:
-            raise ValueError("'output_layer' must be one of "+
-                    "'linear', 'softmax' or 'tanh'.")
+            raise ValueError("'output_layer' must be one of " +
+                             "'linear', 'softmax' or 'tanh'.")
 
         if not loss in ['cross_entropy', 'square', 'crammer_singer']:
             raise ValueError("'loss' must be one of " +
-                    "'cross_entropy', 'square' or 'crammer_singer'.")
+                             "'cross_entropy', 'square' or 'crammer_singer'.")
             self.loss = loss
 
     def fit(self, X, y, max_epochs, shuffle_data, verbose=0):
@@ -78,13 +83,16 @@ class BaseMLP(BaseEstimator):
             X, y = shuffle(X, y)
 
         # generate batch slices
-        batch_slices = list(gen_even_slices(n_batches * self.batch_size, n_batches))
+        batch_slices = list(gen_even_slices(
+            n_batches * self.batch_size, n_batches))
 
         # generate weights.
         # TODO: smart initialization
-        self.weights1_ = np.random.uniform(size=(n_features, self.n_hidden))/np.sqrt(n_features)
+        self.weights1_ = np.random.uniform(
+            size=(n_features, self.n_hidden))/np.sqrt(n_features)
         self.bias1_ = np.zeros(self.n_hidden)
-        self.weights2_ = np.random.uniform(size=(self.n_hidden, self.n_outs))/np.sqrt(self.n_hidden)
+        self.weights2_ = np.random.uniform(
+            size=(self.n_hidden, self.n_outs))/np.sqrt(self.n_hidden)
         self.bias2_ = np.zeros(self.n_outs)
 
         # preallocate memory
@@ -96,7 +104,8 @@ class BaseMLP(BaseEstimator):
         # main loop
         for i, batch_slice in izip(xrange(n_iterations), cycle(batch_slices)):
             self._forward(i, X, batch_slice, x_hidden, x_output)
-            self._backward(i, X, y, batch_slice, x_hidden, x_output, delta_o, delta_h)
+            self._backward(i, X, y, batch_slice, x_hidden, x_output,
+                           delta_o, delta_h)
         return self
 
     def predict(self, X):
@@ -117,11 +126,13 @@ class BaseMLP(BaseEstimator):
         # apply output nonlinearity (if any)
         self.output_func(x_output)
 
-    def _backward(self, i, X, y, batch_slice, x_hidden, x_output, delta_o, delta_h):
+    def _backward(self, i, X, y, batch_slice, x_hidden, x_output,
+                  delta_o, delta_h):
         """Do a backward pass through the network and update the weights"""
 
         # calculate derivative of output layer
-        if self.loss in ['cross_entropy'] or (self.loss == 'square' and self.output_func == id):
+        if self.loss in ['cross_entropy'] or \
+                (self.loss == 'square' and self.output_func == id):
             delta_o[:] = y[batch_slice] - x_output
         elif self.loss == 'crammer_singer':
             raise ValueError("Not implemented yet.")
@@ -132,16 +143,19 @@ class BaseMLP(BaseEstimator):
         elif self.loss == 'square' and self.output_func == _tanh:
             delta_o[:] = (y[batch_slice] - x_output) * _dtanh(x_output)
         else:
-            raise ValueError("Unknown combination of output function and error.")
+            raise ValueError(
+                "Unknown combination of output function and error.")
 
         if self.verbose > 0:
             print(np.linalg.norm(delta_o / self.batch_size))
         delta_h[:] = np.dot(delta_o, self.weights2_.T)
 
         # update weights
-        self.weights2_ += self.lr / self.batch_size * np.dot(x_hidden.T, delta_o)
+        self.weights2_ += self.lr / self.batch_size * \
+            np.dot(x_hidden.T, delta_o)
         self.bias2_ += self.lr * np.mean(delta_o, axis=0)
-        self.weights1_ += self.lr / self.batch_size * np.dot(X[batch_slice].T, delta_h)
+        self.weights1_ += self.lr / self.batch_size * \
+            np.dot(X[batch_slice].T, delta_h)
         self.bias1_ += self.lr * np.mean(delta_h, axis=0)
 
 
@@ -151,16 +165,15 @@ class MLPClassifier(BaseMLP, ClassifierMixin):
     Uses a neural network with one hidden layer.
     """
     def __init__(self, n_hidden=200, lr=0.1, l2decay=0, loss='cross_entropy',
-            output_layer='softmax', batch_size=100, verbose=0):
+                 output_layer='softmax', batch_size=100, verbose=0):
         super(MLPClassifier, self).__init__(n_hidden, lr, l2decay, loss,
-                output_layer, batch_size, verbose)
+                                            output_layer, batch_size, verbose)
 
     def fit(self, X, y, max_epochs=10, shuffle_data=False):
         self.lb = LabelBinarizer()
         one_hot_labels = self.lb.fit_transform(y)
-        super(MLPClassifier, self).fit(
-                X, one_hot_labels, max_epochs,
-                shuffle_data)
+        super(MLPClassifier, self).fit(X, one_hot_labels, max_epochs,
+                                       shuffle_data)
         return self
 
     def predict(self, X):
