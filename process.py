@@ -33,7 +33,7 @@ class OurClassifier(object):
 
 def testset_validate(clf):
     Xtrain, Xtest, Ytrain, Ytest = \
-        skcv.train_test_split(X, Y, train_size=0.8)
+        skcv.train_test_split(X, Y, train_size=0.01)
     clf.fit(Xtrain, Ytrain)
     Ypred = clf.predict(Xtest)
     sc = score(Ytest, Ypred)
@@ -57,14 +57,7 @@ def predict_validation_set(clf):
 X, Y = load_data('train')
 preprocess_features(X)
 
-print 1
-clf = OurClassifier(n_hidden=200, output_layer='linear', loss='square')
+clf = OurClassifier(n_hidden=200)
 testset_validate(clf)
-
-print 3
-clf = OurClassifier(n_hidden=200, output_layer='softmax', loss='cross_entropy')
-testset_validate(clf)
-
-print 4
-clf = OurClassifier(n_hidden=200, output_layer='tanh', loss='square')
-testset_validate(clf)
+predict_validation_set(clf)
+cross_validate(clf)
