@@ -10,7 +10,6 @@ import mlp
 from lib import *
 
 
-
 def preprocess_features(X):
     pass
 
@@ -58,7 +57,14 @@ def predict_validation_set(clf):
 X, Y = load_data('train')
 preprocess_features(X)
 
-clf = OurClassifier(n_hidden=200)
+print 1
+clf = OurClassifier(n_hidden=200, output_layer='linear', loss='square')
 testset_validate(clf)
-predict_validation_set(clf)
-cross_validate(clf)
+
+print 3
+clf = OurClassifier(n_hidden=200, output_layer='softmax', loss='cross_entropy')
+testset_validate(clf)
+
+print 4
+clf = OurClassifier(n_hidden=200, output_layer='tanh', loss='square')
+testset_validate(clf)
