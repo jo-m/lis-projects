@@ -43,6 +43,10 @@ def score(Ytruth, Ypred):
     return sum / np.product(Ytruth.shape)
 
 
+def neg_score(*args):
+    return -score(*args)
+
+
 def grade(score):
     BE = 0.2778
     BH = 0.1791
