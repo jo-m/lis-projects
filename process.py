@@ -12,31 +12,7 @@ from lib import *
 
 
 def preprocess_features(X):
-    pass
-
-
-class OurClassifier(object):
-    def __init__(self, *x, **xx):
-        self.clf = mlp.MLPClassifier(*x, **xx)
-
-    def fit(self, X, Y):
-        X = skpre.StandardScaler().fit_transform(X)
-        self.clf.fit(X, Y)
-        return self
-
-    def predict(self, X):
-        X = skpre.StandardScaler().fit_transform(X)
-        return self.clf.predict(X)
-
-    def get_params(self, *x, **xx):
-        return self.clf.get_params(*x, **xx)
-
-    def set_params(self, *x, **xx):
-        self.clf.set_params(*x, **xx)
-        return self
-
-    def __str__(self):
-        return str(self.clf)
+    X = skpre.StandardScaler().fit_transform(X)
 
 
 def testset_validate(clf):
@@ -81,7 +57,7 @@ def grid_search(clf):
 X, Y = load_data('train')
 preprocess_features(X)
 
-clf = OurClassifier(n_hidden=200)
+clf = mlp.MLPClassifier(n_hidden=200)
 testset_validate(clf)
 predict_validation_set(clf)
 cross_validate(clf)
