@@ -1,27 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 04 16:29:13 2015
-
-@author: Andreas
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 03 16:23:40 2015
-
-@author: Andreas
-"""
 
 import numpy as np
 import pandas as pd 
 import datetime as dt
 import dateutil
 
-
 from sklearn.linear_model import Ridge
 import sklearn.cross_validation as skcv
 import sklearn.metrics as skmet
-
 
 
 def load_data(fname):
@@ -41,21 +27,6 @@ def load_data(fname):
        
     
     del data['date']
-    #del data['dayofyear']
-    #del data['month']
-    #del data['weekday']
-    #del data['year']
-    #del data['hour']
-    #del data['weekend']
-    #del data['notWeekend']
-    #del data['A']
-    #del data['B']
-    #del data['C']
-    #del data['D']
-    #del data['E']
-    #del data['F']
-    
-    
     return data
 
 
@@ -98,8 +69,7 @@ def transformFeatures(X):
     apply_mult(X, 'hour', 'weekend', 9)
     apply_mult(X, 'hour', 'notWeekend', 9)
     apply_mult(X, 'hour', 'weekday', 1)    
-        
-                
+
     return X
 
     
@@ -148,13 +118,3 @@ Y = pd.read_csv('data/train_y.csv',
     header=None,
     names=['y'])
 reg_lin()
-    
-    
-    
-
-
-
-
-
-
-
