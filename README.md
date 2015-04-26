@@ -11,6 +11,12 @@ If you do not use Anaconda, then just use `pip` instead of `$HOME/anaconda/bin/p
     $HOME/anaconda/bin/pip install nolearn
     $HOME/anaconda/bin/pip install -r requirements.txt
     $HOME/anaconda/bin/python setup.py install
+    cd ..; rm -rf Lasagne
+
+    git clone https://github.com/cudamat/cudamat.git
+    cd cudamat
+    PATH="${PATH}:/Developer/NVIDIA/CUDA-7.0/bin" $HOME/anaconda/bin/python setup.py install
+    cd ..; rm -rf cudamat
 
     # should print 'theano'
     $HOME/anaconda/bin/python -c 'import theano; print theano.__name__'

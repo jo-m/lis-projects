@@ -17,3 +17,9 @@ if [ -x "$HOME/anaconda/bin/python" ]; then
 else
     python $run
 fi
+
+if [ $? -eq 0 ]; then
+    say 'run succeeded'
+else 
+    say 'run failed'
+fi
