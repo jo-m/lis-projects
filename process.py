@@ -31,39 +31,46 @@ layers0 = [('input', InputLayer),
            ('dense3', DenseLayer),
            ('output', DenseLayer)]
 
-clf = NeuralNet(layers=layers0,
+params = dict(
+    layers=layers0,
 
-                dropout0_p=0.5,
-                dropout1_p=0.5,
+    dropout0_p=0.5,
+    dropout1_p=0.5,
 
-                dense0_num_units=2048,
-                dense1_num_units=3048,
-                dense2_num_units=1000,
-                dense3_num_units=200,
+    dense0_num_units=2048,
+    dense1_num_units=3048,
+    dense2_num_units=1000,
+    dense3_num_units=200,
 
-                input_shape=(None, num_features),
-                output_num_units=num_classes,
-                output_nonlinearity=softmax,
+    input_shape=(None, num_features),
+    output_num_units=num_classes,
+    output_nonlinearity=softmax,
 
-                update=nesterov_momentum,
-                update_learning_rate=0.01,
-                # update_momentum=0.9,
+    update=nesterov_momentum,
+    update_learning_rate=0.01,
 
-                eval_size=0.2,
-                verbose=1,
-                max_epochs=100,
-                regression=False)
+    eval_size=0.2,
+    verbose=1,
+    max_epochs=20,
+    regression=False
+)
 
-print 'max_epochs=100,'
+clf = NeuralNet(**params)
+
+print '-------------------'
+name = '1'
+print name
+print params
+print '-------------------'
 
 with Timer('testset'):
     Xvalidate, _ = load_data('validate')
     Xvalidate = skpre.StandardScaler().fit_transform(Xvalidate)
     clf.fit(X, Y)
     Yvalidate = clf.predict(Xvalidate)
-    write_Y('validate_full', Yvalidate)
+    write_Y('validate_%s' % name, Yvalidate)
 
-Xtest, _ = load_data('test2')
+Xtest, _ = load_data('test')
 Xtest = skpre.StandardScaler().fit_transform(Xtest)
 Ytest = clf.predict(Xtest)
-write_Y('test2', Ytest)
+write_Y('test_%s' % name, Ytest)
