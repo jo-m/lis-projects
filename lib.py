@@ -2,9 +2,30 @@
 # -*- encoding: utf-8 -*-
 
 from __future__ import unicode_literals
-import numpy as np
 
 import h5py
+import numpy as np
+import sklearn.cross_validation as skcv
+import time
+
+
+class Timer(object):
+    def __init__(self, name=None):
+        self.name = name
+
+    def __enter__(self):
+        self.tstart = time.time()
+
+    def __exit__(self, type, value, traceback):
+        if self.name:
+            print '[%s]' % self.name,
+        print 'Elapsed: %s' % (time.time() - self.tstart)
+
+
+def data_subset(X, Y, factor=0.5):
+    subX, _, subY, _ = \
+        skcv.train_test_split(X, Y, train_size=factor)
+    return subX, subY
 
 
 def to_ndarray(h5_arr, dtype=None):

@@ -1,17 +1,19 @@
 # Images
 Learning and Intelligent Systems - Project 3: <http://las.ethz.ch/courses/lis-s15/>
 
-## Installing Theano
+## Installing libraries
+We have to install Lasagne from source as there are no PiPy packages yet.
+If you do not use Anaconda, then just use `pip` instead of `$HOME/anaconda/bin/pip`.
 
-    # if using anaconda
-    $HOME/anaconda/bin/pip install theano
+    # clone this into some folder
+    git clone git@github.com:Lasagne/Lasagne.git
+    cd Lasagne
+    $HOME/anaconda/bin/pip install nolearn
+    $HOME/anaconda/bin/pip install -r requirements.txt
+    $HOME/anaconda/bin/python setup.py install
+
     # should print 'theano'
     $HOME/anaconda/bin/python -c 'import theano; print theano.__name__'
-
-    # else
-    pip install theano
-    # should print 'theano'
-    python -c 'import theano; print theano.__name__'
 
 Now, we have to enable GPU support.
 

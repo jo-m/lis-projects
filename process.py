@@ -6,8 +6,6 @@ import sklearn.metrics as skmet
 import sklearn.preprocessing as skpre
 import sklearn.grid_search as skgs
 
-import mlp
-
 from lib import *
 
 
@@ -56,9 +54,3 @@ def grid_search(clf):
 
 X, Y = load_data('train')
 preprocess_features(X)
-
-clf = mlp.MLPClassifier(n_hidden=200)
-testset_validate(clf)
-predict_validation_set(clf)
-cross_validate(clf)
-grid_search(clf)
