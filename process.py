@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-import sklearn.cross_validation as skcv
 import sklearn.preprocessing as skpre
 
 
@@ -18,27 +17,29 @@ from lib import *
 X, Y = load_data('train')
 X = skpre.StandardScaler().fit_transform(X)
 
-Xtrain, Xtest, Ytrain, Ytest = \
-    skcv.train_test_split(X, Y, train_size=0.8)
-
 lb = skpre.LabelBinarizer()
-lb.fit(Ytrain)
-
+lb.fit(Y)
 num_classes = len(lb.classes_)
-num_features = Xtrain.shape[1]
+num_features = X.shape[1]
 
 layers0 = [('input', InputLayer),
            ('dense0', DenseLayer),
            ('dropout0', DropoutLayer),
            ('dense1', DenseLayer),
+           ('dense2', DenseLayer),
+           ('dropout1', DropoutLayer),
+           ('dense3', DenseLayer),
            ('output', DenseLayer)]
-
 
 clf = NeuralNet(layers=layers0,
 
-                dense0_num_units=200,
                 dropout0_p=0.5,
-                dense1_num_units=200,
+                dropout1_p=0.5,
+
+                dense0_num_units=2048,
+                dense1_num_units=3048,
+                dense2_num_units=1000,
+                dense3_num_units=200,
 
                 input_shape=(None, num_features),
                 output_num_units=num_classes,
@@ -46,24 +47,23 @@ clf = NeuralNet(layers=layers0,
 
                 update=nesterov_momentum,
                 update_learning_rate=0.01,
-                update_momentum=0.9,
+                # update_momentum=0.9,
 
                 eval_size=0.2,
                 verbose=1,
-                max_epochs=200,
+                max_epochs=100,
                 regression=False)
 
+print 'max_epochs=100,'
 
 with Timer('testset'):
-    clf.fit(Xtrain, Ytrain)
-    Ypred = clf.predict(Xtest)
-    sc = score(Ytest, Ypred)
-    print 'Testset score = %.4f Grade = %d%%' % (sc, grade(sc))
+    Xvalidate, _ = load_data('validate')
+    Xvalidate = skpre.StandardScaler().fit_transform(Xvalidate)
+    clf.fit(X, Y)
+    Yvalidate = clf.predict(Xvalidate)
+    write_Y('validate_full', Yvalidate)
 
-quit()
-
-clf.fit(X, Y)
-Xvalidate, _ = load_data('validate')
-Xvalidate = skpre.StandardScaler().fit_transform(Xvalidate)
-Yvalidate = clf.predict(Xvalidate)
-write_Y('validate', Yvalidate)
+Xtest, _ = load_data('test2')
+Xtest = skpre.StandardScaler().fit_transform(Xtest)
+Ytest = clf.predict(Xtest)
+write_Y('test2', Ytest)
