@@ -1,25 +1,53 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-import pandas as pd
+from sklearn.externals import joblib
 import numpy as np
+import os
+import pandas as pd
 import sklearn.cross_validation as skcv
+import time
+
+pickle_fname = 'data/clf/%03d.dump'
 
 
-def train_test_split_pd(X, Y, train_size):
-    """
-    Like sklearn.cross_validation.train_test_split but retains
-    pandas DataFrame column indizes.
-    """
-    Xtrain, Xtest, Ytrain, Ytest = \
-        skcv.train_test_split(X, Y, train_size=train_size)
+def try_load_clf(X):
+    n = X.shape[0]
+    fname = pickle_fname % n
+    if os.path.isfile(fname):
+        print 'load clf from "%s"' % fname
+        return joblib.load(fname)
 
-    return (
-        pd.DataFrame(Xtrain, columns=X.columns),
-        pd.DataFrame(Xtest, columns=X.columns),
-        pd.DataFrame(Ytrain, columns=Y.columns),
-        pd.DataFrame(Ytest, columns=Y.columns),
-    )
+
+def save_clf(clf, X, overwrite=False):
+    n = X.shape[0]
+    fname = pickle_fname % n
+    if os.path.isfile(fname) and not overwrite:
+        print '"%s" already exists, not overwriting' % fname
+        return
+    print 'save clf to "%s"' % fname
+    joblib.dump(clf, fname)
+
+
+class Timer(object):
+    def __init__(self, name=None):
+        self.name = name
+
+    def __enter__(self):
+        self.tstart = time.time()
+
+    def __exit__(self, type, value, traceback):
+        if self.name:
+            print '[%s]' % self.name,
+        print 'Elapsed: %s' % (time.time() - self.tstart)
+
+
+def data_subset(X, Y, factor=0.5):
+    if isinstance(factor, float) and factor == 1.0:
+        return X, Y
+    subX, _, subY, _ = \
+        skcv.train_test_split(X, Y, train_size=factor)
+    return subX, subY
 
 
 def load_X(fname):
@@ -27,13 +55,13 @@ def load_X(fname):
                        index_col=False,
                        dtype=np.float64,
                        header=None)
-    return data
+    return data.as_matrix()
 
 
 def load_Y(fname):
     return pd.read_csv('data/%s_y.csv' % fname,
                        index_col=False,
-                       header=None)
+                       header=None).as_matrix()
 
 
 # def write_Y(fname, Y):
