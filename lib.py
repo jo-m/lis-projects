@@ -80,12 +80,12 @@ def load_Y(fname):
 #     return sum / np.product(Ytruth.shape)
 
 
-# def grade(score):
-#     BE = 0.3091365975175955
-#     BH = 0.1568001421417719
-#     if score > BE:
-#         return 0
-#     elif score <= BH:
-#         return 100
-#     else:
-#         return (1 - (score - BH) / (BE - BH)) * 50 + 50
+def grade(score):
+    BE = 1.1478864255656418
+    BH = 0.41876196535569227
+    if score > BE:
+        return 0
+    elif score <= BH:
+        return 100
+    else:
+        return (1 - (score - BH) / (BE - BH)) * 50 + 50
