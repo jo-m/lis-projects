@@ -30,11 +30,8 @@ def load_data():
     print 'X_, Y_:', X_.shape, Y_.shape
 
 load_data()
-clf = try_load_clf(X_)
-if clf is None:
-    clf = sksemi.LabelPropagation()
-    clf.fit(X, Y)
-    save_clf(clf, X_)
+clf = sksemi.LabelPropagation()
+clf.fit(Xtrain, Ytrain)
 
 Ypred = clf.predict_proba(Xvalidate)
 print Ypred.shape
