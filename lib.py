@@ -64,6 +64,11 @@ def load_Y(fname):
                        header=None).as_matrix()
 
 
+def info(a, name):
+    print '%s %s has %d NaN elm' % \
+        (name, a.shape, np.count_nonzero(np.isnan(a)))
+
+
 def write_Y(fname, Y):
     if Y.shape[1] != 8:
         raise Exception('Y has invalid shape %s!' % str(Y.shape))
