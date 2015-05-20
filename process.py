@@ -38,5 +38,6 @@ clf.label_distributions_ = np.nan_to_num(clf.label_distributions_)
 info(clf.label_distributions_, 'label_distributions_')
 
 Ypred = clf.predict_proba(Xvalidate)
-
-write_Y('validate_spreading', np.nan_to_num(Ypred))
+write_Y('validate', np.nan_to_num(Ypred))
+YpredTest = clf.predict_proba(Xtest)
+write_Y('test', np.nan_to_num(YpredTest))
