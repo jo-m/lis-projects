@@ -24,7 +24,7 @@ def load_data():
     preprocess_features(Xvalidate)
 
 load_data()
-clf = sksemi.LabelSpreading()
+clf = sksemi.LabelSpreading(kernel='rbf', gamma=0.4, max_iter=9)
 info(Xtrain, 'Xtrain')
 info(Ytrain.ravel(), 'Ytrain.ravel()')
 clf.fit(Xtrain, Ytrain.ravel())
