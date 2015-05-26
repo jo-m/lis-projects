@@ -18,7 +18,7 @@
 \renewcommand{\familydefault}{\sfdefault}
 
 \title{Introduction to Learning and Intelligent Systems - Spring 2015}
-\author{member1@student.ethz.ch\\ member2@student.ethz.ch\\ member3@student.ethz.ch\\}
+\author{jo@student.ethz.ch\\ stegeran@ethz.ch\\sakhadov@student.ethz.ch}
 \date{\today}
 
 \begin{document}
@@ -26,8 +26,12 @@
 
 \section*{Project 4 : Classification with Missing Labels}
 
-Briefly describe the steps used to produce the solution. Feel
-free to add plots or screenshots if you think it's necessary. The
-report should contain a maximum of 2 pages.
+Training data for the last project contained very little labelled samples. Therefore we decided to use a semi-supervised learning method.
+
+For our purposes we utilized a sci-learn python library for semi-supervised learning. Our algorithm of choice was LabelSpreading as it is more robust to noise and performed better before fine tuning parameters.
+
+As the kernel we used Radial Basis Function(RBF). Other available option is k-Nearest Neighbours function which runs faster and does not need as much memory. However for this project the result had a higher preference than the runtime.
+
+RBF kernel takes gamma as a parameter which we fine tuned with cross-validation.
 
 \end{document}
