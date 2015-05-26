@@ -26,11 +26,17 @@
 
 \section*{Project 4 : Classification with Missing Labels}
 
-Training data for the last project contained very little labelled samples. Therefore we decided to use a semi-supervised learning method.
+Training data for the last project contained very little labelled samples (80 out of about 40'000). Therefore we decided to use a semi-supervised learning method.
 
-For our purposes we utilized a sci-learn python library for semi-supervised learning. Our algorithm of choice was LabelSpreading as it is more robust to noise and performed better before fine tuning parameters.
+Experimenting with mixed-gaussian models did not yield very good scores: First we tried the PyMix Python GMM Library. However we did not bring that to work and failed even at the data read-in stage. Sklearn does have a GMM classifier, but it does not have semi-supervised learning builtin. Experimenting with other libraries did not yield any usable results, too.
 
-As the kernel we used Radial Basis Function(RBF). Other available option is k-Nearest Neighbours function which runs faster and does not need as much memory. However for this project the result had a higher preference than the runtime.
+We then decided to go an entirely different path: to use sklearns LabelPropagation and LabelSpreading implementations. This was not very successfull at the beginning, as curiously most of the predicted Y values were NaN (Not a number). Further Investigation showed that after fitting, the sklearn.LabelSpreading internal state label_distributions_ had some values set to NaN, which then propagated to the Ypred values. We choose the solution to just set every NaN to 0 in the internal state. This gave us a score of about 4. Generally we could observe that LabelSpreading gave us much better results than LabelPropagation.
+
+The breaktrough came when we used the Sklearn LabelSpreader with a RBF (Radial basis function) kernel. This bumped our score to 0.71 immediatly.
+
+It is to observe that LabelSpreading with RBF kernel requires quite a lot of memory and CPU power. It ran for about 10 minutes on a Macbooc Pro with 8 cores Intel i7 @ 2.30GHz. The algorithm was not runnable on a 8gb RAM machine.
+
+Another available option is k-Nearest Neighbours function which runs faster and does not need as much memory. However for this project the result had a higher preference than the runtime.
 
 RBF kernel takes gamma as a parameter which we fine tuned with cross-validation.
 
