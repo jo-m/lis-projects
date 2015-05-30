@@ -3,7 +3,6 @@
 
 import numpy as np
 import pandas as pd
-import sklearn.cross_validation as skcv
 import time
 
 
@@ -20,14 +19,6 @@ class Timer(object):
         print 'Elapsed: %s' % (time.time() - self.tstart)
 
 
-def data_subset(X, Y, factor=0.5):
-    if isinstance(factor, float) and factor == 1.0:
-        return X, Y
-    subX, _, subY, _ = \
-        skcv.train_test_split(X, Y, train_size=factor)
-    return subX, subY
-
-
 def load_X(fname):
     data = pd.read_csv('data/%s.csv' % fname,
                        index_col=False,
@@ -40,11 +31,6 @@ def load_Y(fname):
     return pd.read_csv('data/%s_y.csv' % fname,
                        index_col=False,
                        header=None).as_matrix()
-
-
-def info(a, name):
-    print '%s %s has %d NaN elm' % \
-        (name, a.shape, np.count_nonzero(np.isnan(a)))
 
 
 def write_Y(fname, Y):

@@ -25,17 +25,7 @@ def load_data():
 
 load_data()
 clf = sksemi.LabelSpreading(kernel='rbf', gamma=0.4, max_iter=9)
-info(Xtrain, 'Xtrain')
-info(Ytrain.ravel(), 'Ytrain.ravel()')
 clf.fit(Xtrain, Ytrain.ravel())
-
-info(clf.classes_, 'classes_')
-info(clf.label_distributions_, 'label_distributions_')
-info(clf.transduction_, 'transduction_')
-
-clf.label_distributions_ = np.nan_to_num(clf.label_distributions_)
-
-info(clf.label_distributions_, 'label_distributions_')
 
 Ypred = clf.predict_proba(Xvalidate)
 write_Y('validate', np.nan_to_num(Ypred))
